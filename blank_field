@@ -1,0 +1,77 @@
+#!/usr/bin/python3
+"""from tkinter import *
+
+import tkinter
+
+
+root = tkinter.Tk()  # A root window for displaying objects
+# open image
+imageHead = Image.display('player.ppm')
+imageHand = Image.display('hand.png')
+
+imageHead.paste(imageHand, (20, 40), imageHand)
+# Convert the Image object into a TkPhoto object
+tkimage = PhotoImage.PhotoImage(imageHead)
+
+panel1 = Label(root, image=tkimage)
+panel1.grid(row=0, column=2, sticky=E)
+root.mainloop()  # Start the GUI
+
+img = PhotoImage(file="cube1.ppm")
+
+
+from tkinter import *
+
+canvas_width = 300
+canvas_height =300
+
+master = Tk()
+
+canvas = Canvas(master, 
+           width=canvas_width, 
+           height=canvas_height)
+canvas.pack()
+
+img = PhotoImage(file="player.ppm")
+canvas.create_image(20,20, anchor=NW, image=img)
+
+master = Toplevel()
+
+
+img = PhotoImage(file="white.ppm")
+canvas.create_image(20,20, anchor=NW, image=img)
+
+mainloop()"""
+
+
+
+""""#!/usr/bin/python3
+from tkinter import *
+W= 40
+N= 10
+
+m1= Tk()
+w1= Canvas(m1,width=600,height=600)
+w1.pack()
+img= PhotoImage(file="/home/tm/praktikum/python/a.ppm")
+def drawSquare(i,j):
+    w1.create_line(i*W,j*W,(i+1)*W,j*W)
+    w1.create_line((i+1)*W,j*W,(i+1)*W,(j+1)*W)
+    w1.create_line((i+1)*W,(j+1)*W,i*W,(j+1)*W)
+    w1.create_line(i*W,j*W,i*W,(j+1)*W)
+for i in range(N):
+    for j in range(N):
+        drawSquare (i,j)
+
+def drawGraphic(i,j):
+    w1.create_image(i*W,j*W,anchor=NW,image=img)
+
+drawGraphic(1,1)    
+
+mainloop()"""
+
+
+player= PhotoImage(file="/home/tm/praktikum/python/player.ppm")
+
+w1.create_image(i*W,j*W,anchor=NW,image=player)
+
