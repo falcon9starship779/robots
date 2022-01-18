@@ -79,7 +79,7 @@ def initalize(NRobots):
     while n<NRobots:
         i=randint(0,N-1)
         j=randint(0,N-1)
-        print(i,j)
+        #print(i,j)
         if pg.getFigure(i,j) =="B":
             drawRobot(i,j)
             n=n+1
@@ -127,14 +127,11 @@ def moveRobots():
     for i in range(N):
         for j in range(N):
             if pg.getFigure(i,j)=="R":
-                print(f"{i},{j}")
                 robotsOld.append([i,j])
-                print(robotsOld)
     for [i,j] in robotsOld:
         robotsNew.append(preMoveRobot(i,j,ip,jp))
     for [i,j] in robotsOld:drawBlank(i,j)
     for [i1,j1] in robotsNew:
-        print(f"137:{i1},{j1}")
         if pg.getFigure(i1,j1)=="P":gameOver()
         if pg.getFigure(i1,j1)=="R":drawWall(i1,j1)
         if pg.getFigure(i1,j1)=="W":drawWall(i1,j1)
