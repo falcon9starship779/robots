@@ -18,13 +18,17 @@ p1.add(c1)
 overviewPanel=PanedWindow(p1,orient=VERTICAL)
 label1=Label(overviewPanel, text="Left Panel", bg="#edbc95")
 levelLabel=Label(p1, text="Level:0", bg="green")
-highscoreLabel=Label(p1, text="Highscore:0", bg="green")
+highscoreStr=StringVar()
+highscoreStr.set("Highscore:0")
+highscoreLabel=Label(p1, textvariable=highscoreStr, bg="green")
 overviewPanel.add(highscoreLabel)
 overviewPanel.add(levelLabel)
 overviewPanel.add(label1)
 p1.add(overviewPanel)
 
-
+highscore=0
+NRobots=5
+level=0
 
 #images:
 player= PhotoImage(file="/home/tm/praktikum/python/player.ppm")
@@ -72,8 +76,10 @@ def drawBlank(i,j):
     pg.setFigure(i,j,"B")
     drawGrid()
 
-def initalizeNewLevel(level):
-    initalize(level*5)
+def initalizeNewLevel():
+    #for i in range(N):
+        #for j in range(N):
+    initalize((1+level)*NRobots)
 
 
 def initalize(NRobots):
@@ -126,8 +132,26 @@ def isLevelOver():
                 return False
     print("level over")
     return True 
+
+def countRobots():
+    count=0
+    for i in range(N):
+        for j in range(N):
+            if pg.getFigure(i,j)=="R":
+                count=count+1
+    return count
                 
-            #print("You have won!")   
+            #print("You have won!")
+
+def updateHighscore():
+    highscoreStr.set(f"Highscore:{NRobots*(level+1)-countRobots()}")
+
+def newLevel():
+    if isLevelOver():
+        initalizeNewLevel()
+
+
+
 
 def searchPlayerPosition():
     for i in range(N):
@@ -266,6 +290,8 @@ def keyhandler(eve):
     if K=="m":
         moveRobots()
     isLevelOver()
+    updateHighscore()
+    newLevel()
     #print(type(eve))
 c1.bind_all('<Key>', keyhandler)
 
@@ -279,7 +305,7 @@ c1.bind_all('<Key>', keyhandler)
 
 #drawRobot(i,j)
 #initalize(1)
-initalizeNewLevel(1)
+initalizeNewLevel()
 print(searchPlayerPosition())
 #drawWall(3,3)
 pg.printPlayground()
