@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from cProfile import label
 from collections import Counter
 from re import I
 from tkinter import *
@@ -10,8 +11,19 @@ N= 10
 
 
 m1= Tk()
-w1= Canvas(m1,width=500,height=500)
-w1.pack()
+p1 = PanedWindow(m1,orient=HORIZONTAL)
+p1.pack(fill=BOTH, expand=2)
+c1= Canvas(p1,width=600,height=500)
+p1.add(c1)
+overviewPanel=PanedWindow(p1,orient=VERTICAL)
+label1=Label(overviewPanel, text="Left Panel", bg="#edbc95")
+levelLabel=Label(p1, text="Level:0", bg="green")
+highscoreLabel=Label(p1, text="Highscore:0", bg="green")
+overviewPanel.add(highscoreLabel)
+overviewPanel.add(levelLabel)
+overviewPanel.add(label1)
+p1.add(overviewPanel)
+
 
 
 #images:
@@ -21,10 +33,10 @@ wall= PhotoImage(file="/home/tm/praktikum/python/brick2.ppm")
 robot= PhotoImage(file="/home/tm/praktikum/python/monster.ppm")
 
 def drawSquare(i,j):
-    w1.create_line(i*W,j*W,(i+1)*W,j*W)
-    w1.create_line((i+1)*W,j*W,(i+1)*W,(j+1)*W)
-    w1.create_line((i+1)*W,(j+1)*W,i*W,(j+1)*W)
-    w1.create_line(i*W,j*W,i*W,(j+1)*W)
+    c1.create_line(i*W,j*W,(i+1)*W,j*W)
+    c1.create_line((i+1)*W,j*W,(i+1)*W,(j+1)*W)
+    c1.create_line((i+1)*W,(j+1)*W,i*W,(j+1)*W)
+    c1.create_line(i*W,j*W,i*W,(j+1)*W)
 
 def drawGrid():
     for i in range(N):
@@ -33,30 +45,30 @@ def drawGrid():
 
 def drawRobot(i,j):
     global playground
-    #w1.create_text(i*W+0.5*W,j*W+0.5*W,text="R")
-    w1.create_image(i*W,j*W,anchor=NW,image=robot)
+    #c1.create_text(i*W+0.5*W,j*W+0.5*W,text="R")
+    c1.create_image(i*W,j*W,anchor=NW,image=robot)
     pg.setFigure(i,j,"R")
     drawGrid()
 
 def drawPlayer(i,j):
     global playground
-    #w1.create_bitmap ((i+0.5)*W,(j+0.5)*W, bitmap="error")
-    w1.create_image(i*W,j*W,anchor=NW,image=player)
+    #c1.create_bitmap ((i+0.5)*W,(j+0.5)*W, bitmap="error")
+    c1.create_image(i*W,j*W,anchor=NW,image=player)
     pg.setFigure(i,j,"P") 
     drawGrid()
 
 
 def drawWall(i,j):
     global playground
-    w1.create_image(i*W,j*W, anchor=NW, image=wall)
+    c1.create_image(i*W,j*W, anchor=NW, image=wall)
     pg.setFigure(i,j,"W")
     drawGrid()
 
 def drawBlank(i,j):
     global playground
-    #w1.create_text(i*W+0.5*W,j*W+0.5*W, text="x"  )
+    #c1.create_text(i*W+0.5*W,j*W+0.5*W, text="x"  )
     img = PhotoImage(file="white.ppm")
-    w1.create_image(i*W,j*W, anchor=NW, image=white)
+    c1.create_image(i*W,j*W, anchor=NW, image=white)
     pg.setFigure(i,j,"B")
     drawGrid()
 
@@ -107,11 +119,15 @@ def movePlayer(i1,j1,i2,j2):
     drawPlayer(i2,j2)
     drawBlank(i1,j1)
 
-def win():
+def isLevelOver():
     for i in range(N):
         for j in range(N):
-            if Playground(i,j)!="R":
-                print("You have won!")   
+            if pg.getFigure(i,j)=="R":
+                return False
+    print("level over")
+    return True 
+                
+            #print("You have won!")   
 
 def searchPlayerPosition():
     for i in range(N):
@@ -246,10 +262,12 @@ def keyhandler(eve):
         handlePlayerKey(K)
         moveRobots()
 
+
     if K=="m":
         moveRobots()
+    isLevelOver()
     #print(type(eve))
-w1.bind_all('<Key>', keyhandler)
+c1.bind_all('<Key>', keyhandler)
 
 
 
