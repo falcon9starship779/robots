@@ -60,6 +60,10 @@ def drawBlank(i,j):
     pg.setFigure(i,j,"B")
     drawGrid()
 
+def initalizeNewLevel(level):
+    initalize(level*5)
+
+
 def initalize(NRobots):
     if NRobots>N*N/4:
         raise Exception(f"error: too many robots: {NRobots}, max allowed is: {N*N/4}")
@@ -102,6 +106,12 @@ def movePlayer(i1,j1,i2,j2):
         return
     drawPlayer(i2,j2)
     drawBlank(i1,j1)
+
+def win():
+    for i in range(N):
+        for j in range(N):
+            if Playground(i,j)!="R":
+                print("You have won!")   
 
 def searchPlayerPosition():
     for i in range(N):
@@ -250,7 +260,8 @@ w1.bind_all('<Key>', keyhandler)
 
 
 #drawRobot(i,j)
-initalize(10)
+#initalize(1)
+initalizeNewLevel(1)
 print(searchPlayerPosition())
 #drawWall(3,3)
 pg.printPlayground()
