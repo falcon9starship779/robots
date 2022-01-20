@@ -17,10 +17,10 @@ c1= Canvas(p1,width=600,height=500)
 p1.add(c1)
 overviewPanel=PanedWindow(p1,orient=VERTICAL)
 label1=Label(overviewPanel, text="Left Panel", bg="#edbc95")
-levelLabel=Label(p1, text="Level:0", bg="green")
+levelLabel=Label(p1, text="Level:0", bg="#fffc8a")
 highscoreStr=StringVar()
 highscoreStr.set("Highscore:0")
-highscoreLabel=Label(p1, textvariable=highscoreStr, bg="green")
+highscoreLabel=Label(p1, textvariable=highscoreStr, bg="#ff4141")
 overviewPanel.add(highscoreLabel)
 overviewPanel.add(levelLabel)
 overviewPanel.add(label1)
@@ -144,11 +144,12 @@ def countRobots():
             #print("You have won!")
 
 def updateHighscore():
-    highscoreStr.set(f"Highscore:{NRobots*(level+1)-countRobots()}")
+    highscoreStr.set(f"Highscore:{highscore}")
 
 def newLevel():
     if isLevelOver():
         initalizeNewLevel()
+        
 
 
 
@@ -170,6 +171,7 @@ def teleport():
             return
 
 def moveRobots():
+    global highscore
     print("move robots")
     ip,jp=searchPlayerPosition()
     robotsOld=[]
@@ -177,15 +179,24 @@ def moveRobots():
     for i in range(N):
         for j in range(N):
             if pg.getFigure(i,j)=="R":
-                robotsOld.append([i,j])
-    for [i,j] in robotsOld:
-        robotsNew.append(preMoveRobot(i,j,ip,jp))
-    for [i,j] in robotsOld:drawBlank(i,j)
-    for [i1,j1] in robotsNew:
-        if pg.getFigure(i1,j1)=="P":gameOver()
-        if pg.getFigure(i1,j1)=="R":drawWall(i1,j1)
-        if pg.getFigure(i1,j1)=="W":drawWall(i1,j1)
-        if pg.getFigure(i1,j1)=="B":drawRobot(i1,j1)
+                i1,j1=preMoveRobot(i,j,ip,jp)
+                if pg.getFigure(i1,j1)=="W":
+                    highscore+=1
+                    drawBlank(i,j)
+                    pg.setFigure(i,j,"B")
+                if pg.getFigure(i1,j1)=="R":
+                    highscore+=2
+                    drawBlank(i,j)
+                    drawWall(i1,j1)
+                    pg.setFigure(i1,j1,"W")
+                if pg.getFigure(i1,j1)=="R":
+                    gameOver()
+                if pg.getFigure(i1,j1)=="B":
+                    drawRobot(i1,j1)
+                    drawBlank(i,j)
+                    pg.setFigure(i1,j1,"R")
+                    pg.setFigure(i,j,"B")
+    print(f"{highscore}")
 
 
 def gameOver():
@@ -280,18 +291,21 @@ def handlePlayerKey(K):
 playerKeys=[str(i) for i in range(1,10)]+[f"KP_{i}"for i in range(1,10)]+["t","s"]
 
 def keyhandler(eve):
+    global level
     print(eve.keysym)
     K=eve.keysym
     if K in playerKeys:
         handlePlayerKey(K)
         moveRobots()
+        updateHighscore()
 
 
     if K=="m":
         moveRobots()
     isLevelOver()
-    updateHighscore()
+    level=level+1
     newLevel()
+
     #print(type(eve))
 c1.bind_all('<Key>', keyhandler)
 
