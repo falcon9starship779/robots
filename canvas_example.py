@@ -76,29 +76,28 @@ def drawBlank(i,j):
     pg.setFigure(i,j,"B")
     drawGrid()
 
-def initalizeNewLevel():
-    #for i in range(N):
-        #for j in range(N):
-    initalize((1+level)*NRobots)
 
-
-def initalize(NRobots):
-    if NRobots>N*N/4:
-        raise Exception(f"error: too many robots: {NRobots}, max allowed is: {N*N/4}")
-    global pg
+def initalize():
+    global pg, highscore, level
+    level=-1 #will be incremented in in initalizeNewLevel()
+    highscore=0
     pg=Playground(N)
+
+def initalizeNewLevel():
+    global level
+    level+=1
+    nRobots=(level+1)*5
+    for i in range(N):
+        for j in range(N):
+            drawBlank(i,j)
+            pg.setFigure(i,j,"B")
     i=randint(0,N-1)
     j=randint(0,N-1)
-    drawWall(i,j)
-    np=0
-    while np<1:
-        i=randint(0,N-1)
-        j=randint(0,N-1)
-        if pg.getFigure(i,j) =="B":    
-            drawPlayer(i,j)
-            np=np+1
+    drawPlayer(i,j)
+    #drawPlayer(randint(0,N-1),randint(0,N-1)) #alternative solution for the 3 lines
+
     n=0
-    while n<NRobots:
+    while n<nRobots:
         i=randint(0,N-1)
         j=randint(0,N-1)
         #print(i,j)
@@ -318,7 +317,7 @@ c1.bind_all('<Key>', keyhandler)
 
 
 #drawRobot(i,j)
-#initalize(1)
+initalize()
 initalizeNewLevel()
 print(searchPlayerPosition())
 #drawWall(3,3)
