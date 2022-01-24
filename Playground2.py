@@ -2,7 +2,7 @@
 class Playground:
     def __init__(self,N) -> None:
         self.N=N
-        self.playground=[[f"({i},{j})" for j in range (N)]for i in range (N)]
+        self.playground=[["B" for j in range (N)]for i in range (N)]
     """
     put the character c into line i column 
     """
@@ -18,5 +18,12 @@ class Playground:
                 print(self.playground [i][j]+", ",end="")
             print("") #linebreak
 
+    def test(self):
+        for i in range(3):
+            for j in range(3):
+                self.setFigure(i,j,f"({i},{j})")
+        print(self.playground)
+        self.printPlayground()
+        print("(0,1): "+self.getFigure(0,1))
 
-
+Playground(3).test()    

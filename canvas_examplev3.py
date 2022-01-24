@@ -30,10 +30,10 @@ highscore=0
 level=0
 
 #images:
-player= PhotoImage(file="/home/tm/praktikum/python/player.ppm")
-white= PhotoImage(file="/home/tm/praktikum/python/white.ppm")
-wall= PhotoImage(file="/home/tm/praktikum/python/brick2.ppm")
-robot= PhotoImage(file="/home/tm/praktikum/python/monster.ppm")
+player= PhotoImage(file="player.ppm")
+white= PhotoImage(file="white.ppm")
+wall= PhotoImage(file="brick2.ppm")
+robot= PhotoImage(file="monster.ppm")
 
 def drawSquare(i,j):
     c1.create_line(i*W,j*W,(i+1)*W,j*W)
@@ -49,21 +49,21 @@ def drawGrid():
 def drawRobot(i,j):
     global playground
     #c1.create_text(i*W+0.5*W,j*W+0.5*W,text="R")
-    c1.create_image(i*W,j*W,anchor=NW,image=robot)
+    c1.create_image(j*W,i*W,anchor=NW,image=robot)
     pg.setFigure(i,j,"R")
     drawGrid()
 
 def drawPlayer(i,j):
     global playground
     #c1.create_bitmap ((i+0.5)*W,(j+0.5)*W, bitmap="error")
-    c1.create_image(i*W,j*W,anchor=NW,image=player)
+    c1.create_image(j*W,i*W,anchor=NW,image=player)
     pg.setFigure(i,j,"P") 
     drawGrid()
 
 
 def drawWall(i,j):
     global playground
-    c1.create_image(i*W,j*W, anchor=NW, image=wall)
+    c1.create_image(j*W,i*W, anchor=NW, image=wall)
     pg.setFigure(i,j,"W")
     drawGrid()
 
@@ -71,7 +71,7 @@ def drawBlank(i,j):
     global playground
     #c1.create_text(i*W+0.5*W,j*W+0.5*W, text="x"  )
     img = PhotoImage(file="white.ppm")
-    c1.create_image(i*W,j*W, anchor=NW, image=white)
+    c1.create_image(j*W,i*W, anchor=NW, image=white)
     pg.setFigure(i,j,"B")
     drawGrid()
 
@@ -81,12 +81,12 @@ def initalize():
     level=-1 #will be incremented in in initalizeNewLevel()
     highscore=0
     pg=Playground(N)
-    pg.printPlayground()
 
 def initalizeNewLevel():
     global level
     level+=1
     levelLabel["text"]=f"Level:{level}"
+    print(f"level:{level}")###
     nRobots=(level+1)*5
     for i in range(N):
         for j in range(N):
@@ -176,32 +176,58 @@ def moveRobots():
     ip,jp=searchPlayerPosition()
     for i in range(N):
         for j in range(N):
-            print("  ")
-            if pg.getFigure(i,j)=="R":
+# move from field0 to field1
+# +------+------+
+# |field0|field1|   field0 and field1 hold the content before the robot move
+# +------+------+
+#     ----->            
+            field0= pg.getFigure(i,j) # The content of the field at move source.
+            if field0[0]=="R": 
                 i1,j1=preMoveRobot(i,j,ip,jp)
-                if pg.getFigure(i1,j1)=="W":
-                    highscore+=1
-                    drawBlank(i,j)
-                    pg.setFigure(i,j,"B")
-                    continue
-                if pg.getFigure(i1,j1)=="R":
-                    highscore+=2
-                    drawBlank(i,j)
-                    drawWall(i1,j1)
-                    pg.setFigure(i1,j1,"W")
-                    continue
-                if pg.getFigure(i1,j1)=="R":
+                field1= pg.getFigure(i1,j1) # The content of the field at move destination.
+                if field1=="P":
                     gameOver()
-                if pg.getFigure(i1,j1)=="B":
-                    drawRobot(i1,j1)
-                    drawBlank(i,j)
-                    pg.setFigure(i1,j1,"R")
-                    pg.setFigure(i,j,"B")
+                if field1=="W":
+                    highscore+= 1
+                    if (len(field0)==1): pg.setFigure(i,j,'B')
+                    else: pg.setFigure(i,j,fieldi[1:]) # remove the leading 'R'
+                    continue
+                if field1=="B":
+                    if len(field0)==1: pg.setFigure(i,j,'B')
+                    else: pg.setFigure(i,j,field0[1:]) # remove the leading 'R'
+                    pg.setFigure(i1,j1,'r') # Lowercase 'r' indicates, that this field is occupied by a robot after its move.
+                    continue
+                # all other cases: R, Rr, r, rr
+                if len(field0)==1: pg.setFigure(i,j,'B')
+                else: pg.setFigure(i,j,field0[1:]) # remove the leading 'R'
+                pg.setFigure(i1,j1,field1+'r') # we append lowercase r
+                continue
+    pg.printPlayground() ###
+    for i in range(N):
+        for j in range(N):
+            field= pg.getFigure(i,j)
+            if field=='B':
+                drawBlank(i,j)
+                continue
+            if field=='W': # seems to be not necessary
+                drawWall(i,j)
+                continue
+            if field=='P': # seems to be not necessary
+                drawPlayer(i,j)
+                continue
+            if len(field)>1:
+                drawWall(i,j)
+                highscore+= len(field)
+                continue
+            if field=='r':
+                drawRobot(i,j)
+                
     print(f"{highscore}")
 
 
 def gameOver():
-    print("Game Over")
+    print(f"Game Over\nhighscore: {highscore}\nlevel:{level}")
+    
     # raise Exception("_")###
     exit()
 
@@ -249,16 +275,16 @@ def safeTeleport():
 def handlePlayerKey(K):
     if K=="KP_4" or K=="4":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i-1,j)
+        movePlayer(i,j,i,j-1)
     if K=="KP_8" or K=="8":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i,j-1)
+        movePlayer(i,j,i-1,j)
     if K=="KP_6" or K=="6":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i+1,j)
+        movePlayer(i,j,i,j+1)
     if K=="KP_2" or K=="2":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i,j+1)
+        movePlayer(i,j,i+1,j)
     if K=="KP_7" or K=="7":
         i,j=searchPlayerPosition()
         movePlayer(i,j,i-1,j-1)
@@ -267,12 +293,12 @@ def handlePlayerKey(K):
         movePlayer(i,j,i+1,j+1)
     if K=="KP_9" or K=="9":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i+1,j-1)
+        movePlayer(i,j,i-1,j+1)
     if K=="KP_1" or K=="1":
         i,j=searchPlayerPosition()
-        movePlayer(i,j,i-1,j+1)
+        movePlayer(i,j,i+1,j-1)
     if K=="KP_5" or K=="5":
-        i,j=searchPlayerPosition()
+        pass # don't move
     if K=="s":
         safeTeleport()
     if K=="t":
@@ -309,12 +335,96 @@ def keyhandler(eve):
 c1.bind_all('<Key>', keyhandler)
 
 
+def testInitialize():
+    global N
+    N= 5
+    initalize()
+    for i in range(N):
+        for j in range(N):
+            drawBlank(i,j)
+def test1():
+    testInitialize()
+    drawPlayer(0,4)
+    drawRobot(0,0)
+    drawRobot(0,1)
+    drawRobot(1,0)
+    mainloop()
+    exit()
 
+def test2():
+    testInitialize()
+    drawPlayer(1,4)
+    drawRobot(0,0)
+    drawRobot(1,0)
+    drawRobot(1,1)
+    drawRobot(2,0)
+    mainloop()
+    exit()
 
+def test3():
+    testInitialize()
+    drawPlayer(1,0)
+    drawRobot(0,4)
+    drawRobot(1,3)
+    drawRobot(1,4)
+    drawRobot(2,4)
+    mainloop()
+    exit()
+
+def test4():
+    testInitialize()
+    drawPlayer(1,0)
+    drawRobot(0,3)
+    drawRobot(0,4)
+    drawRobot(1,3)
+    drawRobot(1,4)
+    drawRobot(2,3)
+    drawRobot(2,4)
+    mainloop()
+    exit()
+    
+def test5():
+    testInitialize()
+    drawPlayer(1,0)
+    drawRobot(0,3)
+    drawRobot(0,4)
+    drawRobot(1,3)
+    drawRobot(1,4)
+    drawRobot(2,3)
+    drawRobot(2,4)
+    drawRobot(4,4)
+    mainloop()
+    exit()
+    
+def test6():
+    testInitialize()
+    drawPlayer(4,0)
+    drawRobot(0,3)
+    drawRobot(0,4)
+    drawRobot(1,3)
+    drawRobot(1,4)
+    drawRobot(2,3)
+    drawRobot(2,4)
+    drawRobot(4,4)
+    mainloop()
+    exit()
+
+def test7():
+    testInitialize()
+    drawPlayer(2,2)
+    for i in range(5):
+        drawRobot(0,i)
+        drawRobot(4,i)
+        drawRobot(i,0)
+        drawRobot(i,4)
+    mainloop()
+    exit()
+    
+test1()    
 
     
 
-
+"""
 
 #drawRobot(i,j)
 initalize()
@@ -333,3 +443,4 @@ i,j=searchPlayerPosition()
 #drawBlank(1,1)
 
 mainloop()
+"""
