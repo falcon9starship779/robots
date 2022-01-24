@@ -79,17 +79,20 @@ def drawBlank(i,j):
 
 
 def initalize():
-    global pg, highscore, level
+    global pg, highscore, level, isWaitMode
+    isWaitMode=False
     level=-1 #will be incremented in in initalizeNewLevel()
     highscore=0
     pg=Playground(N)
     pg.printPlayground()
 
 def initalizeNewLevel():
-    global level
+    global isWaitMode, level
+    isWaitMode=False
     level+=1
     levelLabel["text"]=f"Level:{level}"
     print(f"level:{level}")###
+    highscoreStr.set(f"Highscore:{highscore}")
     nRobots=(level+1)*5
     for i in range(N):
         for j in range(N):
@@ -209,12 +212,13 @@ def moveRobots():
                 if field1=="P":
                     gameOver()
                 if field1=="W":
-                    if doWait():
+                    if isWaitMode:
                         highscore+=2
                     else:
                         highscore+= 1
                     if (len(field0)==1): pg.setFigure(i,j,'B')
                     else: pg.setFigure(i,j,field0[1:]) # remove the leading 'R'
+                    print(f"highscore1:{highscore}")###
                     continue
                 if field1=="B":
                     if len(field0)==1: pg.setFigure(i,j,'B')
@@ -241,10 +245,11 @@ def moveRobots():
                 continue
             if len(field)>1:
                 drawWall(i,j)
-                if doWait():
+                if isWaitMode:
                     highscore+= len(field)*2
                 else:
                     highscore+= len(field)
+                print(f"highscore1:{highscore}")###
                 continue
             if field=='r':
                 drawRobot(i,j)
@@ -253,6 +258,7 @@ def moveRobots():
 
 def gameOver():
     print("Game Over")
+    highscoreStr.set(f"Highscore:{highscore}")
     messagebox.showinfo(f'Game Over' ,f'highscore:{highscore} level:{level}')
     exit()
 
@@ -328,6 +334,8 @@ def handlePlayerKey(K):
     if K=="t":
         teleport()
     if K=="w":
+        global isWaitMode
+        isWaitMode=True
         doWait()
     
 """def test1():
